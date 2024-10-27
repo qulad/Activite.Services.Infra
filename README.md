@@ -5,6 +5,9 @@
 CONTAINER_NAME=<name_of_container>
 MONGO_INITDB_ROOT_USERNAME=<mongo_username>
 MONGO_INITDB_ROOT_PASSWORD=<mongo_password>
+INFLUXDB_ADMIN_USER=<influx_username>
+INFLUXDB_ADMIN_PASSWORD=<influx_password>
+INFLUXDB_DB=<influx_db_name>
 ```
 
 ## Tested on Windows 11
@@ -13,13 +16,11 @@ MONGO_INITDB_ROOT_PASSWORD=<mongo_password>
 
 Installs:
 * MongoDb (persistent NOSQL database)
-* MongoDb-Exporter (to see mongodb in prometheus)
+* MongoDb-Exporter (to see MongoDb in prometheus)
 * Consul (discovery service)
 * Fabio (load balancing)
 * Swagger UI (API documentation)
 * Seq (centrailized logs)
 * Prometheus (monitoring system)
 * Grafana (visualize monitoring)
-
-## TODO's
-* Add InfluxDb
+* InfluxDb (timeseries DB for Prometheus)
