@@ -39,7 +39,7 @@ services:
     image: fabiolb/fabio:latest
     container_name: fabio
     environment:
-      - "registry.consul.addr=consul:8500"
+      - FABIO_REGISTRY_CONSUL_ADDR=consul:8500
     ports:
       - "9999:9999"
       - "9998:9998"
@@ -101,6 +101,22 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
+  influxdb:
+    image: influxdb:latest
+    container_name: influxdb
+    ports:
+      - "8086:8086"
+    environment:
+      INFLUXDB_ADMIN_USER: ${INFLUXDB_ADMIN_USER}
+      INFLUXDB_ADMIN_PASSWORD: ${INFLUXDB_ADMIN_PASSWORD}
+      INFLUXDB_DB: ${INFLUXDB_DB}
+    volumes:
+      - influxdb_data:/var/lib/influxdb
+    networks:
+      - docker-network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
 networks:
   docker-network:
     driver: bridge
@@ -110,3 +126,4 @@ volumes:
   consul_data:
   seq_data:
   grafana_data:
+  influxdb_data:
