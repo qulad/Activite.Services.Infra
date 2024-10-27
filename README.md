@@ -1,4 +1,4 @@
-# Activitiy.Services.Infra
+# Activite.Services.Infra
 
 .env
 ```
