@@ -1,0 +1,112 @@
+name: ${CONTAINER_NAME}
+services:
+  mongo:
+    image: mongo:latest
+    container_name: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+
+  mongodb-exporter:
+    image: bitnami/mongodb-exporter:latest
+    container_name: mongodb-exporter
+    environment:
+      MONGODB_URI: "mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongo:27017/"
+    ports:
+      - "9216:9216"
+    networks:
+      - docker-network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  consul:
+    image: consul:1.15.4
+    container_name: consul
+    ports:
+      - "8500:8500"
+    networks:
+      - docker-network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - consul_data:/consul/data
+
+  fabio:
+    image: fabiolb/fabio:latest
+    container_name: fabio
+    environment:
+      - "registry.consul.addr=consul:8500"
+    ports:
+      - "9999:9999"
+      - "9998:9998"
+    networks:
+      - docker-network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      - consul
+
+  swagger-ui:
+    image: swaggerapi/swagger-ui
+    container_name: swagger-ui
+    ports:
+      - "8080:8080"
+    environment:
+      - SWAGGER_JSON=/usr/share/nginx/html/swagger.json
+    volumes:
+      - ./swagger.json:/usr/share/nginx/html/swagger.json
+    networks:
+      - docker-network
+    extra_hosts:
+      - "host.docker.internal:host-gateway" 
+
+  seq:
+    image: datalust/seq:latest
+    container_name: seq
+    ports:
+      - "5341:80"
+    environment:
+      ACCEPT_EULA: "Y"
+    volumes:
+      - seq_data:/data
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - docker-network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    networks:
+      - docker-network
+    volumes:
+      - grafana_data:/var/lib/grafana
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+networks:
+  docker-network:
+    driver: bridge
+
+volumes:
+  mongo_data:
+  consul_data:
+  seq_data:
+  grafana_data:
